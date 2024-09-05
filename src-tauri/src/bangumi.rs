@@ -2,7 +2,6 @@ use crate::{
     anime::{Anime, AnimeIndex},
     spider::Spider,
 };
-use anyhow::anyhow;
 use regex::Regex;
 use scraper::{Html, Selector};
 
@@ -18,12 +17,13 @@ impl Spider for Bangumi {
         Bangumi::ID.to_string()
     }
 
-    fn net_check() -> anyhow::Result<()> {
+    fn net_is_ok() -> bool {
         let resp = tauri::async_runtime::block_on(async { reqwest::get(Bangumi::URL).await });
 
-        match resp?.status().is_success() {
-            true => Ok(()),
-            false => Err(anyhow!("连结错误！")),
+        if let Ok(r) = resp {
+            r.status().is_success() 
+        } else {
+            false
         }
     }
 

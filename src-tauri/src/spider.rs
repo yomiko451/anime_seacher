@@ -1,11 +1,9 @@
-use serde::Serialize;
-
 use crate::anime::{Anime, AnimeIndex};
 
 pub trait Spider {
     fn get_id() -> String;
 
-    fn net_check() -> anyhow::Result<()>;
+    fn net_is_ok() -> bool;
 
     async fn get_anime_index(key_words: &str) -> anyhow::Result<Vec<AnimeIndex>>;
 
