@@ -2,6 +2,7 @@
 import {ref, computed, onMounted} from 'vue'
 import { invoke } from '@tauri-apps/api/core';
 import { Picture as IconPicture } from '@element-plus/icons-vue'
+import Contextmenu from './components/Contextmenu.vue';
 
 interface Anime {
     title: string,
@@ -40,9 +41,11 @@ const SearchAnimeNames = async () => {
 
 const anime = ref<Anime | null>(null)
 const handleTableClick = async (newItem: AnimeIndex, _: AnimeIndex ) => {
-    infoLoading.value = true
-    anime.value = await invoke('get_anime_info', {animeIndex: newItem})
-    infoLoading.value = false
+    if (newItem) {
+        infoLoading.value = true
+        anime.value = await invoke('get_anime_info', {animeIndex: newItem})
+        infoLoading.value = false
+    }
 }
 </script>
 
@@ -60,7 +63,7 @@ const handleTableClick = async (newItem: AnimeIndex, _: AnimeIndex ) => {
                 </el-row>
                 <el-row>
                     <el-col class="search-bar">
-                        <el-input v-model="keyWord" placeholder="请输入关键词"/>
+                        <el-input @keyup.enter="SearchAnimeNames" v-model="keyWord" placeholder="请输入关键词"/>
                         <el-button type="primary" @click="SearchAnimeNames">搜索</el-button>
                     </el-col>
                 </el-row>
@@ -95,7 +98,7 @@ const handleTableClick = async (newItem: AnimeIndex, _: AnimeIndex ) => {
                 </el-row>
                 <el-row class="description-box">
                     <el-col>
-                        <el-text size="large">{{ anime?.description }}</el-text>
+                        <el-text size="large" v-html="anime?.description"></el-text>
                     </el-col>
                 </el-row>
             </el-col>
@@ -130,6 +133,7 @@ const handleTableClick = async (newItem: AnimeIndex, _: AnimeIndex ) => {
                 </el-row>
             </el-col>
         </el-row>
+        <Contextmenu />
     </div>
 </template>
 

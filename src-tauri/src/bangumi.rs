@@ -21,7 +21,7 @@ impl Spider for Bangumi {
         let resp = tauri::async_runtime::block_on(async { reqwest::get(Bangumi::URL).await });
 
         if let Ok(r) = resp {
-            r.status().is_success() 
+            r.status().is_success()
         } else {
             false
         }
@@ -67,7 +67,12 @@ impl Spider for Bangumi {
         };
         let mut handle_vec = vec![];
         for i in 2..=page {
-            let url = format!("{}subject_search/{}?cat=2&page={}", Bangumi::URL, key_words, i);
+            let url = format!(
+                "{}subject_search/{}?cat=2&page={}",
+                Bangumi::URL,
+                key_words,
+                i
+            );
             let handle = tauri::async_runtime::spawn(async { reqwest::get(url).await });
             handle_vec.push(handle);
         }

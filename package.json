@@ -12,6 +12,7 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
     "@tauri-apps/api": ">=2.0.0-rc.0",
+    "@tauri-apps/plugin-clipboard-manager": "2.0.0-rc.1",
     "@tauri-apps/plugin-shell": ">=2.0.0-rc.0",
     "element-plus": "^2.8.1",
     "vue": "^3.3.4"

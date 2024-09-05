@@ -24,4 +24,5 @@ regex = "1.10.6"
 anyhow = "1.0.86"
 edit-distance = "2.1.2"
 scraper = { version = "0.20.0", features = ["atomic"] }
+tauri-plugin-clipboard-manager = "2.1.0-beta.7"
 

@@ -1,5 +1,5 @@
 use crate::{
-    anime::{AnimeIndex, Anime},
+    anime::{Anime, AnimeIndex},
     bangumi::Bangumi,
     spider::Spider,
 };
