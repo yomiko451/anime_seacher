@@ -12,7 +12,8 @@ pub fn run() {
             serve::net_is_ok,
             serve::get_id,
             serve::get_anime_index,
-            serve::get_anime_info
+            serve::get_anime_info,
+            serve::show_main_window
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

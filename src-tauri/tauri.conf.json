@@ -1,7 +1,7 @@
 {
   "productName": "anime_seacher",
-  "version": "0.1.0",
-  "identifier": "com.anime_seacher.app",
+  "version": "0.1.1",
+  "identifier": "com.anime-seacher.app",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,8 @@
       {
         "title": "anime_seacher",
         "width": 1280,
-        "height": 720
+        "height": 720,
+        "visible": false
       }
     ],
     "security": {

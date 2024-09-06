@@ -19,6 +19,7 @@ interface AnimeIndex {
 }
 
 onMounted(async () => {
+    await invoke('show_main_window')
     netState.value = await invoke('net_is_ok')
     source.value = await invoke('get_id')
 })

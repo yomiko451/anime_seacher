@@ -1,3 +1,5 @@
+use tauri::Window;
+
 use crate::{
     anime::{Anime, AnimeIndex},
     bangumi::Bangumi,
@@ -25,4 +27,9 @@ pub async fn get_anime_index(key_word: String) -> Vec<AnimeIndex> {
 #[tauri::command()]
 pub async fn get_anime_info(anime_index: AnimeIndex) -> Anime {
     Source::get_anime_info(anime_index).await.unwrap()
+}
+
+#[tauri::command()]
+pub fn show_main_window(window: Window) {
+    window.show().unwrap();
 }
