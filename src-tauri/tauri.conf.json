@@ -1,6 +1,6 @@
 {
   "productName": "anime_seacher",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "identifier": "com.anime-seacher.app",
   "build": {
     "beforeDevCommand": "pnpm dev",

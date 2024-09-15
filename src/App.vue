@@ -56,6 +56,7 @@ const handleTableClick = async (newItem: AnimeIndex, _: AnimeIndex ) => {
 }
 
 document.oncontextmenu = async (e) => {
+    e.preventDefault()
     let element = e.target as HTMLElement
     const menuItems: PredefinedMenuItem[] = []
     menuItems.push(await PredefinedMenuItem.new({ item: 'Copy', text: "复制" }))
