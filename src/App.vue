@@ -1,8 +1,9 @@
 <script lang="ts" setup>
+import { Menu, PredefinedMenuItem } from '@tauri-apps/api/menu'
+import { message } from '@tauri-apps/plugin-dialog'
 import {ref, computed, onMounted} from 'vue'
 import { invoke } from '@tauri-apps/api/core';
 import { Picture as IconPicture } from '@element-plus/icons-vue'
-import Contextmenu from './components/Contextmenu.vue';
 
 interface Anime {
     title: string,
@@ -35,9 +36,14 @@ const resultText = computed(() => {
     return `共计 ${searchResult.value.length} 条检索结果`
 })
 const SearchAnimeNames = async () => {
-    tableLoading.value = true
-    searchResult.value = await invoke('get_anime_index', {keyWord: keyWord.value})
-    tableLoading.value = false
+    if (keyWord.value) {
+        tableLoading.value = true
+        searchResult.value = await invoke('get_anime_index', {keyWord: keyWord.value})
+        tableLoading.value = false
+    } else {
+        await message('关键词不能为空！', { title: '提醒！', kind: 'warning' })
+    }
+    
 }
 
 const anime = ref<Anime | null>(null)
@@ -47,6 +53,22 @@ const handleTableClick = async (newItem: AnimeIndex, _: AnimeIndex ) => {
         anime.value = await invoke('get_anime_info', {animeIndex: newItem})
         infoLoading.value = false
     }
+}
+
+document.oncontextmenu = async (e) => {
+    let element = e.target as HTMLElement
+    const menuItems: PredefinedMenuItem[] = []
+    menuItems.push(await PredefinedMenuItem.new({ item: 'Copy', text: "复制" }))
+    if (element.tagName === 'INPUT') {
+        menuItems.unshift(await PredefinedMenuItem.new({ item: 'Cut', text: "剪切" }))
+        menuItems.push(await PredefinedMenuItem.new({ item: 'Paste', text: "粘贴" }))
+        menuItems.push(await PredefinedMenuItem.new({ item: 'SelectAll', text: "全选" }))
+    } 
+    
+    const menu = await Menu.new({
+        items: menuItems,
+    })
+    await menu.popup()
 }
 </script>
 
@@ -134,7 +156,7 @@ const handleTableClick = async (newItem: AnimeIndex, _: AnimeIndex ) => {
                 </el-row>
             </el-col>
         </el-row>
-        <Contextmenu />
+        
     </div>
 </template>
 
