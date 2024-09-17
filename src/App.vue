@@ -25,21 +25,37 @@ onMounted(async () => {
     source.value = await invoke('get_id')
 })
 
-const netState = ref(false)
-const source = ref('获取中……')
+const netStateText = computed(() => {
+    if (netState.value == null) {
+        return '网路状态：获取中……'
+    } else {
+        return '网路状态：' + (netState?.value?'已连接':'未连接')
+    }
+})
+const netReCheck = async () => {
+    netState.value = null
+    netState.value = await invoke('net_is_ok')
+}
+
+const netState = ref<boolean | null>(null)
+const source = ref<string | null>(null)
 
 const keyWord = ref('')
 const tableLoading = ref(false)
 const infoLoading = ref(false)
-const searchResult = ref<AnimeIndex[]>([])
+const searchResult = ref<AnimeIndex[] | null>([])
 const resultText = computed(() => {
-    return `共计 ${searchResult.value.length} 条检索结果`
+    return `共计 ${searchResult.value?searchResult.value.length:0} 条检索结果`
 })
 const SearchAnimeNames = async () => {
     if (keyWord.value) {
         tableLoading.value = true
         searchResult.value = await invoke('get_anime_index', {keyWord: keyWord.value})
         tableLoading.value = false
+        if (searchResult.value == null) {
+            netState.value = false
+            await message('网络连接错误，请尝试重新连接！', { title: '提醒！', kind: 'warning' })
+        }
     } else {
         await message('关键词不能为空！', { title: '提醒！', kind: 'warning' })
     }
@@ -52,6 +68,10 @@ const handleTableClick = async (newItem: AnimeIndex, _: AnimeIndex ) => {
         infoLoading.value = true
         anime.value = await invoke('get_anime_info', {animeIndex: newItem})
         infoLoading.value = false
+        if (anime.value == null) {
+            netState.value = false
+            await message('网络连接错误，请尝试重新连接！', { title: '提醒！', kind: 'warning' })
+        }
     }
 }
 
@@ -77,12 +97,12 @@ document.oncontextmenu = async (e) => {
     <div class="container">
         <el-row :gutter="10">
             <el-col :span="6" class="subcontainer">
-                <el-row>
-                    <el-col :span="12">
-                        <el-text :type="netState?'success':'danger'">{{ '网路状态：' + (netState?'已连接':'未连接') }}</el-text>
+                <el-row justify="space-evenly">
+                    <el-col :span="11">
+                        <el-text class="net-state" @click="netReCheck" :type="netState?'success':'danger'">{{ netStateText }}</el-text>
                     </el-col>
-                    <el-col :span="12">
-                        <el-text type="success">{{ '数据源：' + source }}</el-text>
+                    <el-col :span="11">
+                        <el-text :type="source?'success':'danger'">{{ '数据源：' + (source?source:'暂无信息') }}</el-text>
                     </el-col>
                 </el-row>
                 <el-row>
@@ -214,5 +234,8 @@ body {
 }
 .cover {
     width: 100%;
+}
+.net-state {
+    cursor: pointer;
 }
 </style>
