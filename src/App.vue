@@ -47,31 +47,36 @@ const searchResult = ref<AnimeIndex[] | null>([])
 const resultText = computed(() => {
     return `共计 ${searchResult.value?searchResult.value.length:0} 条检索结果`
 })
-const SearchAnimeNames = async () => {
+const getAnimeNames = async () => {
     if (keyWord.value) {
         tableLoading.value = true
-        searchResult.value = await invoke('get_anime_index', {keyWord: keyWord.value})
-        tableLoading.value = false
-        if (searchResult.value == null) {
+        invoke<AnimeIndex[]>('get_anime_index', {keyWord: keyWord.value}).then((result) => {
+            netState.value = true
+            searchResult.value = result
+            tableLoading.value = false
+        }).catch((_) => {
             netState.value = false
-            await message('网络连接错误，请尝试重新连接！', { title: '提醒！', kind: 'warning' })
-        }
+            tableLoading.value = false
+            message('网络连接错误，请尝试重新连接！', { title: '提醒！', kind: 'warning' })
+        })
     } else {
         await message('关键词不能为空！', { title: '提醒！', kind: 'warning' })
     }
-    
 }
 
 const anime = ref<Anime | null>(null)
-const handleTableClick = async (newItem: AnimeIndex, _: AnimeIndex ) => {
+const getSelectedAnimeInfo = async (newItem: AnimeIndex, _: AnimeIndex ) => {
     if (newItem) {
         infoLoading.value = true
-        anime.value = await invoke('get_anime_info', {animeIndex: newItem})
-        infoLoading.value = false
-        if (anime.value == null) {
+        invoke<Anime>('get_anime_info', {animeIndex: newItem}).then((result) => {
+            netState.value = true
+            anime.value=result
+            infoLoading.value = false
+        }).catch((_) => {
             netState.value = false
-            await message('网络连接错误，请尝试重新连接！', { title: '提醒！', kind: 'warning' })
-        }
+            infoLoading.value = false
+            message('网络连接错误，请尝试重新连接！', { title: '提醒！', kind: 'warning' })
+        })
     }
 }
 
@@ -107,12 +112,12 @@ document.oncontextmenu = async (e) => {
                 </el-row>
                 <el-row>
                     <el-col class="search-bar">
-                        <el-input @keyup.enter="SearchAnimeNames" v-model="keyWord" placeholder="请输入关键词"/>
-                        <el-button type="primary" @click="SearchAnimeNames">搜索</el-button>
+                        <el-input @keyup.enter="getAnimeNames" v-model="keyWord" placeholder="请输入关键词"/>
+                        <el-button type="primary" @click="getAnimeNames">搜索</el-button>
                     </el-col>
                 </el-row>
                 <el-row class="table-box">
-                    <el-table empty-text="暂无数据" v-loading="tableLoading" :data="searchResult" @current-change="handleTableClick" highlight-current-row border height="100%" size="small">
+                    <el-table empty-text="暂无数据" v-loading="tableLoading" :data="searchResult" @current-change="getSelectedAnimeInfo" highlight-current-row border height="100%" size="small">
                         <el-table-column type="index" width="45" label="序号" />
                         <el-table-column prop="name" :label="resultText" />
                     </el-table>

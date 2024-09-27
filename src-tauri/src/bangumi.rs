@@ -29,8 +29,8 @@ impl Spider for Bangumi {
 
     async fn get_anime_index(key_words: &str) -> anyhow::Result<Vec<AnimeIndex>> {
         let url = format!("{}subject_search/{}?cat=2", Bangumi::URL, key_words);
-        let resp = tauri::async_runtime::spawn(async { reqwest::get(url).await }).await??;
-        let doc = Html::parse_document(&resp.text().await?);
+        let resp = reqwest::get(url).await?.text().await?;
+        let doc = Html::parse_document(&resp);
         let selector = Selector::parse(".item h3>a").unwrap();
 
         let mut anime_names = vec![];
@@ -95,7 +95,7 @@ impl Spider for Bangumi {
             anime_names.extend(temp_anime_names)
         }
 
-        Ok(anime_names)
+        Ok(Self::edit_distance_sort(anime_names, key_words))
     }
 
     async fn get_anime_info(anime_index: AnimeIndex) -> anyhow::Result<Anime> {

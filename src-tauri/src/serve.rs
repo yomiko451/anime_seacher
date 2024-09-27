@@ -20,17 +20,13 @@ pub fn get_id() -> String {
 }
 
 #[tauri::command()]
-pub async fn get_anime_index(key_word: String) -> Option<Vec<AnimeIndex>> {
-    let anime_names = Bangumi::get_anime_index(&key_word).await;
-    match anime_names {
-        Ok(result) => Some(Source::edit_distance_sort(result, &key_word)),
-        Err(_) => None
-    }
+pub async fn get_anime_index(key_word: String) -> Result<Vec<AnimeIndex>, String> {
+    Bangumi::get_anime_index(&key_word).await.map_err(|e|e.to_string())
 }
 
 #[tauri::command()]
-pub async fn get_anime_info(anime_index: AnimeIndex) -> Option<Anime> {
-    Source::get_anime_info(anime_index).await.ok()
+pub async fn get_anime_info(anime_index: AnimeIndex) -> Result<Anime, String> {
+    Source::get_anime_info(anime_index).await.map_err(|e|e.to_string())
 }
 
 #[tauri::command()]
